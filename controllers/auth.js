@@ -5,7 +5,15 @@ const { BadRequestError, UnauthenticatedError } = require('../errors')
 const register = async (req, res) => {
   const user = await User.create({ ...req.body })
   const token = user.createJWT()
-  res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token })
+  res.status(StatusCodes.CREATED).json(
+    { user: 
+      { email: user.email,
+        lastName: user.lastName,
+        location: user.location,
+        name: user.name,
+        token
+   }}
+  )
 }
 
 const login = async (req, res) => {
@@ -24,10 +32,51 @@ const login = async (req, res) => {
   }
   // compare password
   const token = user.createJWT()
-  res.status(StatusCodes.OK).json({ user: { name: user.name }, token })
+  res.status(StatusCodes.OK).json(
+    { user: 
+      { email: user.email,
+        lastName: user.lastName,
+        location: user.location,
+        name: user.name,
+        token
+   }}
+  )
+}
+
+const updateUser = async(req, res) => {
+
+  const {email, name, lastName, location, } = req.body
+
+  const newUserData = req.body
+
+  if (!email || !lastName || !location || !name ) {
+    throw new BadRequestError('Provide data for all categories')
+  }
+
+  const user = await User.findOne({_id: req.user.userId})
+  user.email = email
+  user.lastName = lastName
+  user.location = location
+  user.name = name
+  
+  await user.save()
+
+  const token = await user.createJWT();
+
+  res.status(StatusCodes.OK).json(
+    { user: 
+      { email: user.email,
+        lastName: user.lastName,
+        location: user.location,
+        name: user.name,
+        token
+   }}
+  )
+
 }
 
 module.exports = {
   register,
   login,
+  updateUser
 }
