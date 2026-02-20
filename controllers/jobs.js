@@ -122,6 +122,7 @@ const showStats = async (req, res) => {
   ])
 
   //data massaging
+  // turning {_id: status, count: n} to {status: n}
   stats = stats.reduce((acc, curr)=>{
     const {_id: title, count} = curr;
     acc[title] = count
@@ -148,10 +149,11 @@ const showStats = async (req, res) => {
       { $sort: {'_id.year': -1, '_id.month': -1}},
       { $limit: 6},     
     ])
+    
+    
     //map monthlyApplications into format: 
-    //[ { _id: { year: 2026, month: 2 }, count: 750 } ]n
-    // [ { date: 'Feb 2026', count: 750 } ]
-
+    //[ { _id: { year: 2026, month: 2 }, count: 750 } ]
+    //[ { date: 'Feb 2026', count: 750 } ]
     monthlyApplications = monthlyApplications.map((item)=> {
       const { _id: {year, month}, count } = item;
       const date = moment()
